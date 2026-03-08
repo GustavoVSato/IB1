@@ -3,11 +3,21 @@
 #include <SPI.h>
 #include "esp32-hal-timer.h"
 
+#include "esp_dsp.h"
+
 #define PIN_CS 5      // CS do ADS8326
 #define PIN_SCLK 18   // SCLK
 #define PIN_MISO 19   // DOUT
 
 #define MUX_IN_PIN 25 // controle do MUX
+
+
+#define DELTA
+#define THETA
+#define ALPHA
+#define BETA
+#define BETA_HIGH 
+#define SMR
 
 SPISettings adsSettings(6000000, MSBFIRST, SPI_MODE0);
 
