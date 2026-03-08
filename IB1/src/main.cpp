@@ -30,6 +30,15 @@
 #define BETA_HIGH_MIN 20
 #define BETA_HIGH_MAX 35
 
+#define FFT_SIZE 256
+
+#define FS 256          // frequência de amostragem em Hz
+
+float fft_buffer[FFT_SIZE * 2];
+float fft_magnitude[FFT_SIZE/2];
+
+int sample_index = 0;              // <<< ADICIONADO
+
 SPISettings adsSettings(6000000, MSBFIRST, SPI_MODE0);
 
 hw_timer_t *timer = NULL;
@@ -45,14 +54,35 @@ void setup() {
   ads_init();     // inicializa SPI e ADC
   mux_init();     // inicia timer do MUX
 
-  dsps_fft2r_init_fc32(NULL, 256); // inicializa DSP
+  dsps_fft2r_init_fc32(NULL, FFT_SIZE); // inicializa DSP
 }
 void loop() {
 
   uint16_t sample = ads_read();
 
-  Serial.println(sample);
+  fft_buffer[2 * sample_index] = (float)sample;
+  fft_buffer[2 * sample_index + 1] = 0;
+
+  sample_index++;
+
+  if(sample_index >= FFT_SIZE){
+
+    sample_index = 0;
+
+    dsps_fft2r_fc32(fft_buffer, FFT_SIZE);
+    dsps_bit_rev_fc32(fft_buffer, FFT_SIZE);
+    dsps_cplx2reC_fc32(fft_buffer, FFT_SIZE);
+
+    for(int i = 0; i < FFT_SIZE/2; i++){
+      float real = fft_buffer[2*i];
+      float imag = fft_buffer[2*i+1];
+      fft_magnitude[i] = real*real + imag*imag; 
+    }
+
+  }
+
 }
+
 
 // put function definitions here:
 void IRAM_ATTR onTimer() {
