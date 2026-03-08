@@ -12,12 +12,23 @@
 #define MUX_IN_PIN 25 // controle do MUX
 
 
-#define DELTA
-#define THETA
-#define ALPHA
-#define BETA
-#define BETA_HIGH 
-#define SMR
+#define DELTA_MIN 0.1
+#define DELTA_MAX 3
+
+#define THETA_MIN 4
+#define THETA_MAX 7
+
+#define ALPHA_MIN 8
+#define ALPHA_MAX 12
+
+#define SMR_MIN 12
+#define SMR_MAX 15
+
+#define BETA_MIN 15
+#define BETA_MAX 20
+
+#define BETA_HIGH_MIN 20
+#define BETA_HIGH_MAX 35
 
 SPISettings adsSettings(6000000, MSBFIRST, SPI_MODE0);
 
@@ -28,11 +39,19 @@ volatile bool muxState = false;
 
 
 void setup() {
-  
-}
 
+  Serial.begin(115200);
+
+  ads_init();     // inicializa SPI e ADC
+  mux_init();     // inicia timer do MUX
+
+  dsps_fft2r_init_fc32(NULL, 256); // inicializa DSP
+}
 void loop() {
-  
+
+  uint16_t sample = ads_read();
+
+  Serial.println(sample);
 }
 
 // put function definitions here:
