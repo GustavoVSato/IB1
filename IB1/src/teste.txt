@@ -1,0 +1,44 @@
+#include <Arduino.h>
+#include <SPI.h>
+
+#define PIN_CS 5
+#define PIN_SCLK 18
+#define PIN_MISO 23
+#define PIN_MOSI 25
+
+SPISettings adsSettings(1000000, MSBFIRST, SPI_MODE0);
+
+void setup() {
+    Serial.begin(115200);
+    
+    pinMode(PIN_CS, OUTPUT);
+    digitalWrite(PIN_CS, HIGH);
+    SPI.begin(PIN_SCLK, PIN_MISO, PIN_MOSI);
+    
+    Serial.println("Iniciando Teste SPI do ADS8326...");
+}
+
+void loop() {
+    uint8_t b1, b2, b3;
+
+    SPI.beginTransaction(adsSettings);
+    digitalWrite(PIN_CS, LOW);
+
+    b1 = SPI.transfer(0x00);
+    b2 = SPI.transfer(0x00);
+    b3 = SPI.transfer(0x00);
+
+    digitalWrite(PIN_CS, HIGH);
+    SPI.endTransaction();
+    
+    // Remonta os 16 bits
+    uint16_t result = 0;
+    result |= (b1 & 0x03) << 14;
+    result |= (b2) << 6;
+    result |= (b3) >> 2;
+
+    Serial.print("Valor Bruto ADC (0 a 65535): ");
+    Serial.println(result);
+
+    delay(100); // Lê 10 vezes por segundo para facilitar a leitura na tela
+}

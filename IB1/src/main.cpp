@@ -2,6 +2,7 @@
 #include <SPI.h>
 #include "esp_dsp.h"
 #include "esp_timer.h"
+#include <math.h>
 
 #define PIN_CS 5
 #define PIN_SCLK 18
@@ -178,7 +179,7 @@ void IRAM_ATTR sampling_callback(void* arg)
     float microvolts = adc_to_microvolts(sample);
 
     write_buffer[2 * sample_index] = microvolts;
-    write_buffer[2 * sample_index + 1] = 0;
+    write_buffer[2 * sample_index + 1] = 0; 
 
     sample_index++;
 
